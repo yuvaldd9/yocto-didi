@@ -1,0 +1,35 @@
+#!/bin/sh
+
+mount_overlay() {
+    local dir=$1
+    local upperdir="/overlay/upper/${dir}"
+    local workdir="/overlay/work/${dir}"
+
+    mkdir -p "${upperdir}" "${workdir}"
+
+    mount -t overlay overlay -o lowerdir="${dir}",upperdir="${upperdir}",workdir="${workdir}" "${dir}"
+}
+
+case "$1" in
+    start)
+        for dir in @@OVERLAY_DIRS@@; do
+            logger "Overlaying $dir"
+            mount_overlay $dir
+        done
+    ;;
+    stop)
+        for dir in @@OVERLAY_DIRS@@; do
+            umount $dir
+        done
+    ;;
+    restart)
+        $0 stop
+        $0 start
+    ;;
+    *)
+        echo "Usage $0 {start|stop|restart}"
+        exit 1
+        ;;
+esac
+
+exit 0
