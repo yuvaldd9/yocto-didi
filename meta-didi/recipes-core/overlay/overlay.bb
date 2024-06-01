@@ -5,6 +5,10 @@ SRC_URI = " \
     file://overlay \
 "
 
+RDEPENDS:{PN} += " \
+    python3-didistro-tools \
+"
+
 INITSCRIPT_NAME = "overlay"
 INITSCRIPT_PARAMS= "defaults"
 

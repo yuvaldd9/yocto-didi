@@ -1,0 +1,38 @@
+if load mmc 0:1 ${scriptaddr} next_boot_side; then
+    setenv next_boot_side ${scriptaddr}
+else
+    echo "Failed to load next_boot_side file, defaulting to side 0"
+    setenv next_boot_side 0
+fi
+
+echo "Booting from side ${next_boot_side}"
+
+# Convert loaded value to a string (assuming it is a single character)
+setenv next_boot_side ${next_boot_side:0:1}
+
+# Determine the rootfs based on the next_boot_side value
+if test "${next_boot_side}" = "0"; then
+    setenv rootfs /dev/mmcblk0p2
+    setenv current_side 0
+else
+    setenv rootfs /dev/mmcblk0p3
+    setenv current_side 1
+fi
+
+echo "Rootfs: ${rootfs}"
+# Set the boot argument to use the determined rootfs
+
+setenv bootargs root=${rootfs}
+
+if test "${current_side}" = "0"; then
+    echo 0 > ${scriptaddr}
+else
+    echo 1 > ${scriptaddr}
+fi
+
+fatwrite mmc 0:1 ${scriptaddr} current_side 1
+
+fdt addr ${fdt_addr} && fdt get value bootargs /chosen bootargs
+fatload mmc 0:1 ${kernel_addr_r} @@KERNEL_IMAGETYPE@@
+if test ! -e mmc 0:1 uboot.env; then saveenv; fi;
+@@KERNEL_BOOTCMD@@ ${kernel_addr_r} - ${fdt_addr}
