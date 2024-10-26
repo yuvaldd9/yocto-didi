@@ -3,5 +3,6 @@
 # Raspberry Pi. Boot files are located in the first vfat partition.
 
 part /boot --source bootimg-partition --ondisk mmcblk0 --fstype=vfat --label bootfs --active --align 4096 --size 20
-part / --source rootfs --ondisk mmcblk0 --fstype=ext4 --label rootfs --align 4096
+part / --source rootfs --ondisk mmcblk0 --fstype=ext4 --label rootfs1 --align 4096 --exclude-path=didistro/
+part / --source rootfs --ondisk mmcblk0 --fstype=ext4 --label rootfs2 --align 4096 --exclude-path=didistro/
 part /overlay --ondisk mmcblk0 --fstype=ext4 --label overlay --align 4096 --size 1G
